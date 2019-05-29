@@ -1,0 +1,9 @@
+extends layout
+
+block content
+  h1= title
+
+  each val in genre_list
+      li 
+        a(href=val.url) #{val.name} 
+        //- |  (#{author.date_of_birth} - #{author.date_of_death})
