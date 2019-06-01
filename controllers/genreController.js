@@ -8,7 +8,13 @@ var async = require('async');
 // They are the callback functions that are called when specific routes are taken
 // with a specific HTTP request verb.
 
-// Display list of all Genre.
+// Display list of all Genres.
+
+/* When using mongoose, documents can be retrieved using helpers. Every model 
+method that accepts query conditions can be executed by means of a callback or 
+the exec method. Therefore when you don't pass a callback you can build a query 
+and eventually execute it. Mongoose will not execute a query until then or 
+exec has been called upon it. */
 exports.genre_list = function(req, res) {
     
     Genre.find()    
@@ -53,9 +59,20 @@ exports.genre_create_get = function(req, res, next) {
     res.render('genre_form', { title: 'Create Genre' });
 };
 
+
+
+
+/* The first thing to note is that instead of being a single middleware function 
+(with arguments (req, res, next)) the controller specifies an array 
+of middleware functions. 
+The array is passed to the router function and each method is called in order. */
+
 // Handle Genre create on POST.
 exports.genre_create_post =  [
    
+    // The body method specifies a set of fields in the request body to validate 
+    // along with an optional error message that can be displayed if it fails the tests.
+    // the trim() method eliminates any whitespace after the string
     // Validate that the name field is not empty.
     body('name', 'Genre name required').isLength({ min: 1 }).trim(),
     
@@ -74,8 +91,10 @@ exports.genre_create_post =  [
       );
   
   
-      if (!errors.isEmpty()) {
-        // There are errors. Render the form again with sanitized values/error messages.
+      if (!errors.isEmpty()) { //checks if errors from the extracted validationResult is empty. 
+        // If false then there are obviously errors.
+        // Render the form again with sanitized values/error messages.
+        console.log(errors.array())
         res.render('genre_form', { title: 'Create Genre', genre: genre, errors: errors.array()});
         return;
       }

@@ -1,3 +1,5 @@
+const { body,validationResult } = require('express-validator/check');
+const { sanitizeBody } = require('express-validator/filter');
 var Author = require('../models/author');
 var async = require('async');
 var Book = require('../models/book');
@@ -46,21 +48,112 @@ exports.author_detail = function(req, res, next) {
 
 // Display Author create form on GET
 exports.author_create_get = (req, res) => {
-    res.send('NOT IMPLEMENTED: Author create GET');
+    //Display Author form on GET
+    res.render('author_form', {title: 'Create Author'});
 };
+
 // Handle Author create on POST
-exports.author_create_post = (req, res) => {
-    res.send('NOT IMPLEMENTED: Author create on POST' +req.params.id);
+exports.author_create_post = [
+
+    //Validate fields
+    /* We can daisy chain validators, using withMessage() to specify the error message
+    to display if the previous validation method fails. This makes it very easy to 
+    provide specific error messages without lots of code duplication. */
+    body('first_name').isLength({min: 1}).trim().withMessage('First name must be specified.')
+        .isAlphanumeric().withMessage('First name has non-alphanumeric characters.'),
+    body('family_name').isLength({min: 1}).trim().withMessage('First name must be specified.')
+        .isAlphanumeric().withMessage('First name has non-alphanumeric characters.'), 
+    /* We can use the optional() function to run a subsequent validation only if a field 
+    has been entered (this allows us to validate optional fields). 
+    For example, below we check that the optional date of birth is an ISO8601-compliant
+    date (the checkFalsy flag means that we'll accept either an empty string or null as an empty value). */   
+    body('date_of_birth', 'Invalid date of birth').optional({ checkFalsy: true }).isISO8601(),
+    body('date_of_death', 'Invalid date of death').optional({ checkFalsy: true }).isISO8601(),               
+
+    // Sanitize fields.
+    sanitizeBody('first_name').escape(),
+    sanitizeBody('family_name').escape(),
+    /* Parameters are recieved from the request as strings. We can use toDate() 
+    (or toBoolean(), etc.) to cast these to the proper JavaScript types. */
+    sanitizeBody('date_of_birth').toDate(),
+    sanitizeBody('date_of_death').toDate(),
+
+    // Process request after validation and sanitization.
+    (req, res, next) => {
+        const errors = validationResult(req);
+
+        if (!errors.isEmpty()) {
+            // There are errors. Render form again with sanitized values/errors messages.
+            res.render('author_form', { title: 'Create Author', author: req.body, errors: errors.array() });
+            return;
+        } else {
+            // Data from form is valid.
+
+            // Create an Author object with escaped and trimmed data.
+            var author = new Author(
+                {
+                    first_name: req.body.first_name,
+                    family_name: req.body.family_name
+                });
+            author.save(function(err) {
+                if (err) {return next(err)}
+                // Successful - redirect to new author record.
+                res.redirect(author.url);
+            });    
+        }
+    }
+];
+
+// Display Author delete form on GET.
+exports.author_delete_get = function(req, res, next) {
+    async.parallel({
+        author: function(callback) {
+            Author.findById(req.params.id).exec(callback)
+        },
+        authors_books: function(callback) {
+          Book.find({ 'author': req.params.id }).exec(callback)
+        },
+    }, function(err, results) {
+        if (err) { return next(err); }
+        /* If  findById() returns no results the author is not in the database. 
+        In this case there is nothing to delete, so we immediately render the 
+        list of all authors.  */
+        if (results.author==null) { // No results.
+            res.redirect('/catalog/authors');
+        }
+        // Successful, so render.
+        console.log(results.author);
+        res.render('author_delete', { title: 'Delete Author', author: results.author, author_books: results.authors_books } );
+    });
 };
 
-// Handle Author delete form on GET
-exports.author_delete_get = (req, res) => {
-    res.send('NOT IMPLEMENTED: Author delete GET');
-};
+// Handle Author delete on POST.
+exports.author_delete_post = function(req, res, next) {
 
-// Handle Author delete on POST
-exports.author_delete_post = (req, res) => {
-    res.send('NOT IMPLEMENTED: Author delete POST');
+    async.parallel({
+        author: function(callback) {
+          Author.findById(req.body.authorid).exec(callback)
+        },
+        authors_books: function(callback) {
+          Book.find({ 'author': req.body.authorid }).exec(callback)
+        },
+    }, function(err, results) {
+        if (err) { return next(err); }
+        // Success
+        if (results.authors_books.length > 0) {
+            // Author has books. Render in same way as for GET route.
+            res.render('author_delete', { title: 'Delete Author', author: results.author, author_books: results.authors_books } );
+            return;
+        }
+        else {
+            // Author has no books. Delete object and redirect to the list of authors.
+            Author.findByIdAndRemove(req.body.authorid, function deleteAuthor(err) {
+                if (err) { return next(err); }
+                // Success - go to author list
+                res.redirect('/catalog/authors')
+            })
+        }
+    });
 };
 
 // Handle Author update form on GET
