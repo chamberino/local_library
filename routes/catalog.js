@@ -53,9 +53,12 @@ router.get('/author/:id/delete', author_controller.author_delete_get);
 // POST request to delete Author.
 router.post('/author/:id/delete', author_controller.author_delete_post);
 
-// GET request to update Author.
+
+//******   FIX DATE ISSUE: NOT FORMATTED CORRECTLY   ******/
+// GET request to update Author.  
 router.get('/author/:id/update', author_controller.author_update_get);
 
+//******  IMPLEMENTED, BUT DATE NOT FORMATTED CORRECTLY  ******/
 // POST request to update Author.
 router.post('/author/:id/update', author_controller.author_update_post);
 
@@ -73,9 +76,11 @@ router.get('/genre/create', genre_controller.genre_create_get);
 //POST request for creating Genre.
 router.post('/genre/create', genre_controller.genre_create_post);
 
+//******  NOT IMPLEMENTED  ******/
 // GET request to delete Genre.
 router.get('/genre/:id/delete', genre_controller.genre_delete_get);
 
+//******  NOT IMPLEMENTED  ******/
 // POST request to delete Genre.
 router.post('/genre/:id/delete', genre_controller.genre_delete_post);
 
@@ -99,15 +104,19 @@ router.get('/bookinstance/create', book_instance_controller.bookinstance_create_
 // POST request for creating BookInstance. 
 router.post('/bookinstance/create', book_instance_controller.bookinstance_create_post);
 
+//******  NOT IMPLEMENTED  ******/
 // GET request to delete BookInstance.
 router.get('/bookinstance/:id/delete', book_instance_controller.bookinstance_delete_get);
 
+//******  NOT IMPLEMENTED  ******/
 // POST request to delete BookInstance.
 router.post('/bookinstance/:id/delete', book_instance_controller.bookinstance_delete_post);
 
+//******  NOT IMPLEMENTED  ******/
 // GET request to update BookInstance.
 router.get('/bookinstance/:id/update', book_instance_controller.bookinstance_update_get);
 
+//******  NOT IMPLEMENTED  ******/
 // POST request to update BookInstance.
 router.post('/bookinstance/:id/update', book_instance_controller.bookinstance_update_post);
 
