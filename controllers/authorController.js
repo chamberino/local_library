@@ -87,7 +87,6 @@ exports.author_create_post = [
             res.render('author_form', { title: 'Create Author', author: req.body, errors: errors.array() });
             return;
         } else {
-            console.log(req.body);
             // Data from form is valid.
 
             // Create an Author object with escaped and trimmed data.
@@ -125,7 +124,6 @@ exports.author_delete_get = function(req, res, next) {
             res.redirect('/catalog/authors');
         }
         // Successful, so render.
-        console.log(results.author);
         res.render('author_delete', { title: 'Delete Author', author: results.author, author_books: results.authors_books } );
     });
 };
@@ -174,7 +172,6 @@ exports.author_update_get = function(req, res) {
             return next(err);
         }
         // Successful, so render.
-        console.log(results.author.date_of_birth)
         res.render('author_form', { title: 'Author Update', author: results.author } );
     });
 };
@@ -234,7 +231,6 @@ exports.author_update_post = [
                     return next(err);
                 }
                 // Successful, so render.
-                console.log(results.author.date_of_birth)
                 res.render('author_form', { title: 'Author Update', author: results.author } );
             });    
             return;
@@ -242,7 +238,6 @@ exports.author_update_post = [
             // Data from form is valid.
             Author.findByIdAndUpdate(req.params.id, author, {}, function (err,theauthor) {
                 if (err) {return next(err)}
-                console.log(theauthor)
                 // Successful - redirect to new author record.
                 res.redirect(theauthor.url);
             });    

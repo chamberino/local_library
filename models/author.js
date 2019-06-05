@@ -19,12 +19,6 @@ AuthorSchema
   return this.family_name + ', ' + this.first_name;
 });
 
-// BookInstanceSchema
-// .virtual('due_back_formatted')
-// .get(function () {
-//   return moment(this.due_back).format('MMMM Do, YYYY');
-// });
-
 // // Virtual for author's lifespan
 AuthorSchema
 .virtual('dob_formatted')
@@ -36,6 +30,18 @@ AuthorSchema
 .virtual('dod_formatted')
 .get(function () {
   return this.date_of_death ? moment(this.date_of_death).format('MMMM Do, YYYY') : '';
+});
+
+AuthorSchema
+.virtual('update_dob_formatted')
+.get(function () {
+  return this.date_of_birth ? moment(this.date_of_birth).format('YYYY-MM-DD') : '';
+});
+
+AuthorSchema
+.virtual('update_dod_formatted')
+.get(function () {
+  return this.date_of_death ? moment(this.date_of_death).format('YYYY-MM-DD') : '';
 });
 
 // Virtual for author's lifespan

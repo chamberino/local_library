@@ -94,7 +94,6 @@ exports.genre_create_post =  [
       if (!errors.isEmpty()) { //checks if errors from the extracted validationResult is empty. 
         // If false then there are obviously errors.
         // Render the form again with sanitized values/error messages.
-        console.log(errors.array())
         res.render('genre_form', { title: 'Create Genre', genre: genre, errors: errors.array()});
         return;
       }
@@ -142,7 +141,6 @@ exports.genre_delete_get = function(req, res, next) {
           res.redirect('/catalog/genres');
       }
       // Successful, so render.
-      console.log(results.genres);
       res.render('genre_delete.pug', {title: 'Delete Genre', genre: results.genre, genre_books: results.genre_books});
     });
 };
